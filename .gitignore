@@ -1,0 +1,52 @@
+# .NET / WinUI: generated builds, packages and local caches
+bin/
+obj/
+TestResults/
+artifacts/
+AppPackages/
+BundleArtifacts/
+Generated Files/
+.dotnet-cli/
+.packages/
+packages/
+*.cache
+*.nupkg
+*.snupkg
+*.msix
+*.msixbundle
+*.appx
+*.appxbundle
+
+# IDE and machine-specific settings
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Private configuration and signing material
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.key
+*.pem
+
+# Temporary files, logs and OS metadata
+tmp/
+temp/
+*.log
+*.tmp
+*.temp
+*.bak
+*.old
+*.orig
+*.rej
+__pycache__/
+*.py[cod]
+.DS_Store
+Thumbs.db
+Desktop.ini

@@ -1,0 +1,643 @@
+<Window
+    x:Class="DynamicIsland.App.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Dynamic Island">
+
+    <Grid
+        x:Name="Root"
+        Background="{StaticResource IslandSurfaceBrush}"
+        PointerEntered="OnIslandPointerEntered"
+        PointerExited="OnIslandPointerExited">
+        <Grid.Resources>
+            <Storyboard x:Name="TimerCompletionAnimation">
+                <DoubleAnimation Storyboard.TargetName="TimerCompletionIcon" Storyboard.TargetProperty="Opacity"
+                    From="1" To="0.35" Duration="0:0:0.5" AutoReverse="True" RepeatBehavior="3x" />
+                <DoubleAnimation Storyboard.TargetName="TimerCompletionRotation" Storyboard.TargetProperty="Angle"
+                    From="-14" To="14" Duration="0:0:0.25" AutoReverse="True" RepeatBehavior="6x" />
+            </Storyboard>
+        </Grid.Resources>
+        <Button
+            x:Name="CompactIsland"
+            AutomationProperties.HelpText="Coloca el puntero sobre la isla para expandirla"
+            AutomationProperties.Name="{x:Bind ViewModel.AccessibleState, Mode=OneWay}"
+            CornerRadius="23"
+            Height="46"
+            HorizontalAlignment="Stretch"
+            IsTabStop="False"
+            Style="{StaticResource IslandSurfaceButtonStyle}">
+            <Grid>
+                <StackPanel
+                    x:Name="WeatherCompactContent"
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="11"
+                    Visibility="{x:Bind ViewModel.WeatherCompactVisibility, Mode=OneWay}">
+                    <TextBlock
+                        FontFamily="Segoe UI Variable Text"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        Text="{x:Bind ViewModel.ClockText, Mode=OneWay}"
+                        VerticalAlignment="Center" />
+                    <Border Background="{StaticResource IslandBorderBrush}" Height="18" Width="1" />
+                    <FontIcon Foreground="{StaticResource IslandAccentBrush}" Glyph="&#xE753;" FontSize="13" />
+                    <TextBlock
+                        FontFamily="Segoe UI Variable Text"
+                        FontSize="13"
+                        Text="{x:Bind ViewModel.Temperature, Mode=OneWay}"
+                        VerticalAlignment="Center" />
+                </StackPanel>
+
+                <StackPanel
+                    x:Name="CodexCompactContent"
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="10"
+                    Visibility="{x:Bind ViewModel.CodexCompactVisibility, Mode=OneWay}">
+                    <Ellipse Fill="{StaticResource IslandAccentBrush}" Height="8" VerticalAlignment="Center" Width="8" />
+                    <TextBlock
+                        FontFamily="Segoe UI Variable Text"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        Text="{x:Bind ViewModel.CodexStatusText, Mode=OneWay}"
+                        VerticalAlignment="Center" />
+                    <Border Background="{StaticResource IslandBorderBrush}" Height="18" Width="1" />
+                    <TextBlock
+                        Foreground="{StaticResource IslandSecondaryTextBrush}"
+                        FontFamily="Segoe UI Variable Text"
+                        FontSize="12"
+                        Text="{x:Bind ViewModel.FiveHourRemainingText, Mode=OneWay}"
+                        VerticalAlignment="Center" />
+                </StackPanel>
+
+                <StackPanel
+                    x:Name="MediaCompactContent"
+                    HorizontalAlignment="Left"
+                    Margin="17,0,0,0"
+                    Orientation="Horizontal"
+                    Spacing="9"
+                    Visibility="{x:Bind ViewModel.MediaCompactVisibility, Mode=OneWay}">
+                    <Border Background="#241F1935" CornerRadius="6" Height="24" Width="24">
+                        <Grid>
+                            <Image
+                                AutomationProperties.Name="Carátula de la canción"
+                                Source="{x:Bind ViewModel.MediaArtworkSource, Mode=OneWay}"
+                                Stretch="UniformToFill"
+                                Visibility="{x:Bind ViewModel.MediaArtworkVisibility, Mode=OneWay}" />
+                            <FontIcon
+                                FontSize="14"
+                                Foreground="{StaticResource IslandAccentBrush}"
+                                Glyph="&#xE8D6;"
+                                Visibility="{x:Bind ViewModel.MediaArtworkFallbackVisibility, Mode=OneWay}" />
+                        </Grid>
+                    </Border>
+                    <TextBlock
+                        FontFamily="Segoe UI Variable Text"
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        MaxWidth="146"
+                        Text="{x:Bind ViewModel.MediaTitle, Mode=OneWay}"
+                        TextTrimming="CharacterEllipsis"
+                        VerticalAlignment="Center" />
+                </StackPanel>
+
+                <StackPanel
+                    HorizontalAlignment="Left"
+                    Margin="23,0,0,0"
+                    Orientation="Horizontal"
+                    PointerEntered="OnTimerContentPointerEntered"
+                    Spacing="12"
+                    Visibility="{x:Bind ViewModel.TimerCompactVisibility, Mode=OneWay}">
+                    <FontIcon Foreground="{StaticResource IslandAccentBrush}" Glyph="&#xE916;" FontSize="17" />
+                    <TextBlock FontFamily="Consolas" FontSize="18" FontWeight="SemiBold"
+                        Text="{x:Bind ViewModel.TimerText, Mode=OneWay}" VerticalAlignment="Center" />
+                </StackPanel>
+
+                <StackPanel
+                    x:Name="TransientCompactContent"
+                    HorizontalAlignment="Left"
+                    Margin="18,0,18,0"
+                    Orientation="Horizontal"
+                    Spacing="11"
+                    Visibility="Collapsed">
+                    <Border Background="#241F1935" CornerRadius="12" Height="26" Width="26">
+                        <Grid>
+                            <Image
+                                Source="{x:Bind ViewModel.TransientImageSource, Mode=OneWay}"
+                                Stretch="UniformToFill"
+                                Visibility="{x:Bind ViewModel.TransientImageVisibility, Mode=OneWay}" />
+                            <FontIcon
+                                FontSize="14"
+                                Foreground="{StaticResource IslandAccentBrush}"
+                                Glyph="{x:Bind ViewModel.TransientGlyph, Mode=OneWay}"
+                                Visibility="{x:Bind ViewModel.TransientGlyphVisibility, Mode=OneWay}" />
+                        </Grid>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock
+                            FontFamily="Segoe UI Variable Text"
+                            FontSize="11"
+                            FontWeight="SemiBold"
+                            Text="{x:Bind ViewModel.TransientTitle, Mode=OneWay}" />
+                        <TextBlock
+                            FontFamily="Segoe UI Variable Text"
+                            FontSize="11"
+                            Foreground="{StaticResource IslandSecondaryTextBrush}"
+                            MaxWidth="264"
+                            Text="{x:Bind ViewModel.TransientBody, Mode=OneWay}"
+                            TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Button>
+
+        <StackPanel
+            x:Name="CompactMediaControls"
+            HorizontalAlignment="Right"
+            Margin="0,0,13,0"
+            Orientation="Horizontal"
+            Spacing="3"
+            VerticalAlignment="Center"
+            Visibility="Collapsed">
+            <Button
+                AutomationProperties.Name="Pista anterior"
+                Height="28"
+                Style="{StaticResource ScenarioSwitcherButtonStyle}"
+                Tapped="OnMediaPreviousTapped"
+                Width="28">
+                <FontIcon FontSize="12" Glyph="&#xE892;" />
+            </Button>
+            <Button
+                AutomationProperties.Name="{x:Bind ViewModel.MediaPlaybackActionName, Mode=OneWay}"
+                Height="28"
+                Style="{StaticResource ScenarioSwitcherButtonStyle}"
+                Tapped="OnMediaPlayPauseTapped"
+                Width="28">
+                <FontIcon FontSize="12" Glyph="{x:Bind ViewModel.MediaPlayPauseGlyph, Mode=OneWay}" />
+            </Button>
+            <Button
+                AutomationProperties.Name="Pista siguiente"
+                Height="28"
+                Style="{StaticResource ScenarioSwitcherButtonStyle}"
+                Tapped="OnMediaNextTapped"
+                Width="28">
+                <FontIcon FontSize="12" Glyph="&#xE893;" />
+            </Button>
+        </StackPanel>
+
+        <Button
+            x:Name="CompactTimerControl"
+            AutomationProperties.Name="{x:Bind ViewModel.TimerActionName, Mode=OneWay}"
+            HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,15,0"
+            Height="30" Width="30" Visibility="Collapsed"
+            Style="{StaticResource ScenarioSwitcherButtonStyle}"
+            Click="OnTimerToggleClicked">
+            <FontIcon FontSize="13" Glyph="{x:Bind ViewModel.TimerActionGlyph, Mode=OneWay}" />
+        </Button>
+
+        <Border
+            x:Name="ExpandedIsland"
+            AutomationProperties.HelpText="Retira el puntero para contraer o usa el botón lateral para cambiar de escenario"
+            AutomationProperties.Name="{x:Bind ViewModel.AccessibleState, Mode=OneWay}"
+            Background="{StaticResource IslandSurfaceBrush}"
+            CornerRadius="88"
+            Height="176"
+            HorizontalAlignment="Stretch"
+            Visibility="Collapsed">
+            <Grid>
+                <Grid
+                    Padding="24,17,96,17"
+                    Visibility="{x:Bind ViewModel.CalendarDashboardVisibility, Mode=OneWay}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="96" />
+                        <ColumnDefinition Width="12" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border
+                        Grid.Column="0"
+                        Background="#16FFFFFF"
+                        CornerRadius="14">
+                        <StackPanel
+                            HorizontalAlignment="Center"
+                            Spacing="1"
+                            VerticalAlignment="Center">
+                            <TextBlock
+                                Foreground="{StaticResource IslandAccentBrush}"
+                                FontFamily="Segoe UI Variable Text"
+                                FontSize="10"
+                                FontWeight="Bold"
+                                HorizontalAlignment="Center"
+                                Text="{x:Bind ViewModel.CalendarMonthText, Mode=OneWay}" />
+                            <TextBlock
+                                Foreground="{StaticResource IslandSecondaryTextBrush}"
+                                FontSize="11"
+                                HorizontalAlignment="Center"
+                                Text="{x:Bind ViewModel.CalendarYearText, Mode=OneWay}" />
+                            <TextBlock
+                                FontFamily="Segoe UI Variable Display"
+                                FontSize="46"
+                                FontWeight="SemiBold"
+                                HorizontalAlignment="Center"
+                                Margin="0,-2,0,-5"
+                                Text="{x:Bind ViewModel.CalendarDayText, Mode=OneWay}" />
+                            <TextBlock
+                                Foreground="{StaticResource IslandSecondaryTextBrush}"
+                                FontSize="11"
+                                HorizontalAlignment="Center"
+                                Text="{x:Bind ViewModel.CalendarWeekdayText, Mode=OneWay}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Grid
+                        x:Name="CalendarGrid"
+                        Grid.Column="2"
+                        Height="134"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Center" />
+                </Grid>
+
+                <Grid
+                    Padding="28,22,90,20"
+                    Visibility="{x:Bind ViewModel.WeatherDetailsVisibility, Mode=OneWay}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.08*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock
+                            FontFamily="Segoe UI Variable Text"
+                            FontSize="13"
+                            FontWeight="SemiBold"
+                            Text="{x:Bind ViewModel.Location, Mode=OneWay}" />
+                        <StackPanel Margin="0,13,0,0" Orientation="Horizontal" Spacing="12">
+                            <FontIcon
+                                Foreground="{StaticResource IslandAccentBrush}"
+                                FontSize="40"
+                                Glyph="&#xE753;"
+                                VerticalAlignment="Center" />
+                            <TextBlock
+                                FontFamily="Segoe UI Variable Display"
+                                FontSize="42"
+                                FontWeight="SemiBold"
+                                Text="{x:Bind ViewModel.Temperature, Mode=OneWay}"
+                                VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock
+                            Margin="0,5,0,0"
+                            Foreground="{StaticResource IslandSecondaryTextBrush}"
+                            FontFamily="Segoe UI Variable Text"
+                            FontSize="13"
+                            Text="{x:Bind ViewModel.Condition, Mode=OneWay}" />
+                    </StackPanel>
+
+                    <Grid Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Background="{StaticResource IslandBorderBrush}" Margin="0,4,0,4" />
+                        <StackPanel Grid.Column="1" Margin="20,0,0,0" Spacing="12" VerticalAlignment="Center">
+                            <TextBlock Foreground="{StaticResource IslandSecondaryTextBrush}">
+                                <Run Text="Viento: " />
+                                <Run Text="{x:Bind ViewModel.Wind, Mode=OneWay}" />
+                            </TextBlock>
+                            <TextBlock Foreground="{StaticResource IslandSecondaryTextBrush}">
+                                <Run Text="Sensación: " />
+                                <Run Text="{x:Bind ViewModel.FeelsLike, Mode=OneWay}" />
+                            </TextBlock>
+                            <TextBlock Foreground="{StaticResource IslandSecondaryTextBrush}">
+                                <Run Text="Humedad: " />
+                                <Run Text="{x:Bind ViewModel.Humidity, Mode=OneWay}" />
+                            </TextBlock>
+                            <TextBlock
+                                FontSize="10"
+                                Foreground="{StaticResource IslandSecondaryTextBrush}"
+                                Opacity="0.65"
+                                Text="{x:Bind ViewModel.WeatherSource, Mode=OneWay}" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+
+                <Grid
+                    Padding="27,20,64,20"
+                    Visibility="{x:Bind ViewModel.CodexSceneVisibility, Mode=OneWay}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="112" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Background="#241F1935" CornerRadius="32" Height="64" Width="64">
+                            <FontIcon
+                                Foreground="{StaticResource IslandAccentBrush}"
+                                FontSize="30"
+                                Glyph="&#xE943;" />
+                        </Border>
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            Margin="0,8,0,0"
+                            FontFamily="Segoe UI Variable Display"
+                            FontSize="14"
+                            FontWeight="SemiBold"
+                            Text="Codex" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Spacing="7" VerticalAlignment="Center">
+                        <TextBlock
+                            FontFamily="Segoe UI Variable Display"
+                            FontSize="17"
+                            FontWeight="SemiBold"
+                            Text="{x:Bind ViewModel.CodexStatusText, Mode=OneWay}" />
+                        <TextBlock
+                            Foreground="{StaticResource IslandSecondaryTextBrush}"
+                            FontSize="11"
+                            Text="{x:Bind ViewModel.CodexMessage, Mode=OneWay}" />
+
+                        <Grid Margin="0,5,0,0">
+                            <TextBlock FontSize="11" Text="5 horas" />
+                            <TextBlock
+                                HorizontalAlignment="Right"
+                                Foreground="{StaticResource IslandSecondaryTextBrush}"
+                                FontSize="11"
+                                Text="{x:Bind ViewModel.FiveHourRemainingText, Mode=OneWay}" />
+                        </Grid>
+                        <ProgressBar
+                            Background="#22FFFFFF"
+                            Foreground="{StaticResource IslandAccentBrush}"
+                            Height="5"
+                            Maximum="100"
+                            Value="{x:Bind ViewModel.FiveHourRemainingPercent, Mode=OneWay}" />
+
+                        <Grid Margin="0,2,0,0">
+                            <TextBlock FontSize="11" Text="Semanal" />
+                            <TextBlock
+                                HorizontalAlignment="Right"
+                                Foreground="{StaticResource IslandSecondaryTextBrush}"
+                                FontSize="11"
+                                Text="{x:Bind ViewModel.WeeklyRemainingText, Mode=OneWay}" />
+                        </Grid>
+                        <ProgressBar
+                            Background="#22FFFFFF"
+                            Foreground="{StaticResource IslandAccentBrush}"
+                            Height="5"
+                            Maximum="100"
+                            Value="{x:Bind ViewModel.WeeklyRemainingPercent, Mode=OneWay}" />
+                    </StackPanel>
+                </Grid>
+
+                <Grid
+                    Padding="27,20,64,20"
+                    Visibility="{x:Bind ViewModel.MediaSceneVisibility, Mode=OneWay}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="104" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Background="#241F1935" CornerRadius="34" Height="68" Width="68">
+                            <Grid>
+                                <Image
+                                    AutomationProperties.Name="Carátula de la canción"
+                                    Source="{x:Bind ViewModel.MediaArtworkSource, Mode=OneWay}"
+                                    Stretch="UniformToFill"
+                                    Visibility="{x:Bind ViewModel.MediaArtworkVisibility, Mode=OneWay}" />
+                                <FontIcon
+                                    FontSize="31"
+                                    Foreground="{StaticResource IslandAccentBrush}"
+                                    Glyph="&#xE8D6;"
+                                    Visibility="{x:Bind ViewModel.MediaArtworkFallbackVisibility, Mode=OneWay}" />
+                            </Grid>
+                        </Border>
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            Margin="0,8,0,0"
+                            FontFamily="Segoe UI Variable Display"
+                            FontSize="13"
+                            FontWeight="SemiBold"
+                            Text="Música" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Spacing="8" VerticalAlignment="Center">
+                        <TextBlock
+                            FontFamily="Segoe UI Variable Display"
+                            FontSize="16"
+                            FontWeight="SemiBold"
+                            Text="{x:Bind ViewModel.MediaTitle, Mode=OneWay}"
+                            TextTrimming="CharacterEllipsis" />
+                        <TextBlock
+                            Foreground="{StaticResource IslandSecondaryTextBrush}"
+                            FontSize="11"
+                            Text="{x:Bind ViewModel.MediaArtist, Mode=OneWay}"
+                            TextTrimming="CharacterEllipsis" />
+                        <Grid ColumnSpacing="9">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                FontSize="10"
+                                Foreground="{StaticResource IslandSecondaryTextBrush}"
+                                Text="{x:Bind ViewModel.MediaElapsedText, Mode=OneWay}"
+                                VerticalAlignment="Center" />
+                            <ProgressBar
+                                Grid.Column="1"
+                                AutomationProperties.Name="Progreso de la canción"
+                                Background="#22FFFFFF"
+                                Foreground="{StaticResource IslandAccentBrush}"
+                                Height="4"
+                                Maximum="100"
+                                Value="{x:Bind ViewModel.MediaProgressPercent, Mode=OneWay}" />
+                            <TextBlock
+                                Grid.Column="2"
+                                FontSize="10"
+                                Foreground="{StaticResource IslandSecondaryTextBrush}"
+                                Text="{x:Bind ViewModel.MediaDurationText, Mode=OneWay}"
+                                VerticalAlignment="Center" />
+                        </Grid>
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Button
+                                AutomationProperties.Name="Pista anterior"
+                                Style="{StaticResource ScenarioSwitcherButtonStyle}"
+                                Tapped="OnMediaPreviousTapped">
+                                <FontIcon FontSize="15" Glyph="&#xE892;" />
+                            </Button>
+                            <Button
+                                AutomationProperties.Name="{x:Bind ViewModel.MediaPlaybackActionName, Mode=OneWay}"
+                                Style="{StaticResource ScenarioSwitcherButtonStyle}"
+                                Tapped="OnMediaPlayPauseTapped">
+                                <FontIcon
+                                    FontSize="15"
+                                    Glyph="{x:Bind ViewModel.MediaPlayPauseGlyph, Mode=OneWay}" />
+                            </Button>
+                            <Button
+                                AutomationProperties.Name="Pista siguiente"
+                                Style="{StaticResource ScenarioSwitcherButtonStyle}"
+                                Tapped="OnMediaNextTapped">
+                                <FontIcon FontSize="15" Glyph="&#xE893;" />
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+
+                <Grid Padding="40,22,72,22"
+                    Visibility="{x:Bind ViewModel.TimerSceneVisibility, Mode=OneWay}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center" Spacing="5">
+                        <TextBlock Text="Cronómetro" FontSize="13" FontWeight="SemiBold" />
+                        <TextBlock Text="{x:Bind ViewModel.TimerText, Mode=OneWay}"
+                            FontFamily="Consolas" FontSize="30" FontWeight="SemiBold" />
+                        <TextBlock Text="{x:Bind ViewModel.TimerStatusText, Mode=OneWay}" FontSize="11"
+                            Foreground="{StaticResource IslandSecondaryTextBrush}" />
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,3,0,0">
+                            <Button AutomationProperties.Name="{x:Bind ViewModel.TimerActionName, Mode=OneWay}"
+                                Style="{StaticResource ScenarioSwitcherButtonStyle}" Height="30" Width="38"
+                                Click="OnTimerToggleClicked">
+                                <FontIcon FontSize="13" Glyph="{x:Bind ViewModel.TimerActionGlyph, Mode=OneWay}" />
+                            </Button>
+                            <Button AutomationProperties.Name="Reiniciar cronómetro"
+                                Style="{StaticResource ScenarioSwitcherButtonStyle}" Height="30" Width="38"
+                                Click="OnTimerResetClicked">
+                                <FontIcon FontSize="13" Glyph="&#xE777;" />
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                    <Grid Grid.Column="1" ColumnSpacing="8" VerticalAlignment="Center"
+                        IsHitTestVisible="{x:Bind ViewModel.CanEditTimer, Mode=OneWay}"
+                        Opacity="{x:Bind ViewModel.TimerEditorOpacity, Mode=OneWay}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Spacing="4" HorizontalAlignment="Center">
+                            <TextBlock Text="Minutos" FontSize="11" HorizontalAlignment="Center"
+                                Foreground="{StaticResource IslandSecondaryTextBrush}" />
+                            <Button AutomationProperties.Name="Añadir un minuto" Content="+" Tag="MinutesUp"
+                                IsEnabled="{x:Bind ViewModel.CanEditTimer, Mode=OneWay}"
+                                Style="{StaticResource ScenarioSwitcherButtonStyle}" Height="26" Width="42"
+                                Click="OnTimerAdjustClicked" />
+                            <TextBlock Text="{x:Bind ViewModel.TimerMinutesText, Mode=OneWay}"
+                                FontFamily="Consolas" FontSize="24" HorizontalAlignment="Center" />
+                            <Button AutomationProperties.Name="Quitar un minuto" Content="−" Tag="MinutesDown"
+                                IsEnabled="{x:Bind ViewModel.CanEditTimer, Mode=OneWay}"
+                                Style="{StaticResource ScenarioSwitcherButtonStyle}" Height="26" Width="42"
+                                Click="OnTimerAdjustClicked" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="4" HorizontalAlignment="Center">
+                            <TextBlock Text="Segundos" FontSize="11" HorizontalAlignment="Center"
+                                Foreground="{StaticResource IslandSecondaryTextBrush}" />
+                            <Button AutomationProperties.Name="Añadir un segundo" Content="+" Tag="SecondsUp"
+                                IsEnabled="{x:Bind ViewModel.CanEditTimer, Mode=OneWay}"
+                                Style="{StaticResource ScenarioSwitcherButtonStyle}" Height="26" Width="42"
+                                Click="OnTimerAdjustClicked" />
+                            <TextBlock Text="{x:Bind ViewModel.TimerSecondsText, Mode=OneWay}"
+                                FontFamily="Consolas" FontSize="24" HorizontalAlignment="Center" />
+                            <Button AutomationProperties.Name="Quitar un segundo" Content="−" Tag="SecondsDown"
+                                IsEnabled="{x:Bind ViewModel.CanEditTimer, Mode=OneWay}"
+                                Style="{StaticResource ScenarioSwitcherButtonStyle}" Height="26" Width="42"
+                                Click="OnTimerAdjustClicked" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+
+                <Button
+                    x:Name="WeatherPageToggle"
+                    AutomationProperties.Name="{x:Bind ViewModel.WeatherPageToggleName, Mode=OneWay}"
+                    CornerRadius="14"
+                    Height="28"
+                    HorizontalAlignment="Right"
+                    Margin="0,0,63,0"
+                    Style="{StaticResource ScenarioSwitcherButtonStyle}"
+                    Tapped="OnWeatherPageToggleTapped"
+                    VerticalAlignment="Center"
+                    Visibility="{x:Bind ViewModel.WeatherSceneVisibility, Mode=OneWay}"
+                    Width="28">
+                    <FontIcon
+                        FontSize="13"
+                        Glyph="{x:Bind ViewModel.WeatherPageToggleGlyph, Mode=OneWay}" />
+                </Button>
+
+                <Border
+                    HorizontalAlignment="Right"
+                    Background="{StaticResource IslandBorderBrush}"
+                    Margin="0,24,54,64"
+                    Width="1" />
+                <Button
+                    x:Name="ScenarioSwitcher"
+                    AutomationProperties.Name="{x:Bind ViewModel.ScenarioButtonName, Mode=OneWay}"
+                    HorizontalAlignment="Right"
+                    Margin="0,0,10,0"
+                    Style="{StaticResource ScenarioSwitcherButtonStyle}"
+                    Tapped="OnScenarioSwitcherTapped"
+                    VerticalAlignment="Center">
+                    <FontIcon
+                        FontSize="16"
+                        Glyph="{x:Bind ViewModel.ScenarioGlyph, Mode=OneWay}" />
+                </Button>
+
+                <Button
+                    x:Name="PositionMenuButton"
+                    AutomationProperties.Name="Mover la isla dinámica"
+                    ToolTipService.ToolTip="Mover la isla"
+                    Height="36"
+                    Width="36"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Margin="0,0,26,28"
+                    Style="{StaticResource ScenarioSwitcherButtonStyle}">
+                    <Button.Flyout>
+                        <MenuFlyout
+                            x:Name="PositionFlyout"
+                            AllowFocusOnInteraction="False"
+                            Placement="Bottom"
+                            Opening="OnPositionFlyoutOpening"
+                            Closed="OnPositionFlyoutClosed">
+                            <RadioMenuFlyoutItem
+                                x:Name="LeftPositionItem"
+                                Text="Izquierda"
+                                Tag="Left"
+                                GroupName="IslandPlacement"
+                                Click="OnPositionSelected" />
+                            <RadioMenuFlyoutItem
+                                x:Name="CenterPositionItem"
+                                Text="Centro"
+                                Tag="Center"
+                                GroupName="IslandPlacement"
+                                IsChecked="True"
+                                Click="OnPositionSelected" />
+                            <RadioMenuFlyoutItem
+                                x:Name="RightPositionItem"
+                                Text="Derecha"
+                                Tag="Right"
+                                GroupName="IslandPlacement"
+                                Click="OnPositionSelected" />
+                        </MenuFlyout>
+                    </Button.Flyout>
+                    <FontIcon FontSize="16" Glyph="&#xE712;" />
+                </Button>
+            </Grid>
+        </Border>
+        <Border x:Name="TimerCompletionOverlay" Visibility="Collapsed"
+            Background="{StaticResource IslandSurfaceBrush}" CornerRadius="88"
+            AutomationProperties.Name="Cronómetro. Tiempo terminado."
+            AutomationProperties.LiveSetting="Assertive">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="14">
+                <FontIcon x:Name="TimerCompletionIcon" FontSize="25" Glyph="&#xE823;"
+                    Foreground="{StaticResource IslandAccentBrush}" RenderTransformOrigin="0.5,0.5">
+                    <FontIcon.RenderTransform>
+                        <RotateTransform x:Name="TimerCompletionRotation" />
+                    </FontIcon.RenderTransform>
+                </FontIcon>
+                <TextBlock Text="¡Tiempo terminado!" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
